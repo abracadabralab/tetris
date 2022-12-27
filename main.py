@@ -34,7 +34,7 @@ class Window:
 
 
 def main():
-    window = Window((1280, 720))
+    window = Window((700, 720))
     window.start()
 
 
