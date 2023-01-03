@@ -78,7 +78,8 @@ class Block:
     def fall(self, level):
         for row in range(self.end_y, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
-                self.grid[row + 1 + level][block] = self.grid[row + level][block]
+                if not self.grid[row + level + 1][block]:
+                    self.grid[row + 1 + level][block] = self.grid[row + level][block]
                 self.grid[row + level][block] = None
 
     def __move(self, direction: Direction):
@@ -104,6 +105,6 @@ class Block:
 
         for i in range(len(self.shape[0])):
             if self.shape[-1][i]:
-                if self.grid[level + 2][n[i]]:
+                if self.grid[level + len(self.shape)][n[i]]:
                     return False
         return True
