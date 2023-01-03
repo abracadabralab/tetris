@@ -12,7 +12,7 @@ class Window:
         self.run: bool = True
         self.blocks: list = []
         self.current_block: Block = None
-        self.grid: list[list] = [[None] * int(size[0] / 20) for _ in range(int(size[1] / 20))]
+        self.grid: list[list] = [[False] * int(size[0] / 20) for _ in range(int(size[1] / 20))]
         self.step: int = 20
         self.block_level: int = 0
 
@@ -32,7 +32,7 @@ class Window:
 
             self.display.fill("black")
 
-            if self.block_level <= (self.screen_size[1]/self.step - 3):
+            if self.current_block.can_fall(self.block_level):
                 self.current_block.fall(self.block_level)
                 self.block_level += 1
             else:
@@ -51,7 +51,7 @@ class Window:
             for j in range(len(self.grid[i])):
                 if self.grid[i][j]:
                     rect = pg.Rect((self.step * j, self.step * i), (self.step, self.step))
-                    pg.draw.rect(self.display, "purple", rect)
+                    pg.draw.rect(self.display, "orange", rect)
 
 
 def main():

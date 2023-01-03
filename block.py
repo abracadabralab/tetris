@@ -39,43 +39,21 @@ SHAPES = list(map(np.array, [
     TEEWEE,
 ]))
 
-COLORS = [
-    "orange",
-    "blue",
-    "red",
-    "green",
-    "cyan",
-    "purple",
-    "yellow",
-]
-BLOCKS = list(map(np.array, [
-    BLUE_RICKY,
-    CLEVELAND_Z,
-    HERO,
-    ORANGE_RICKY,
-    RHODE_ISLAND_Z,
-    SMASHBOY,
-    TEEWEE,
-]))
+COLORS = {
+    "ORANGE_RICKY": "orange",
+    "BLUE_RICKY": "blue",
+    "CLEVELAND_Z": "red",
+    "RHODE_ISLAND_Z": "green",
+    "HERO": "cyan",
+    "TEEWEE": "purple",
+    "SMASHBOY": "yellow",
+}
+
 
 class Direction(Enum):
     RIGHT = 1
     LEFT = 2
 
-
-
-class Block:
-    def __init__(self, shape: list[np.ndarray], size: tuple[int, int] = (20, 20)):
-        self.shape: list[np.ndarray] = shape
-        self.size: tuple[int, int] = size
-
-    def draw(self, display):
-        # Iterate over shape and draw rectangles
-        for row in range(len(self.shape)):
-            for column in range(len(self.shape[row])):
-                if self.shape[row][column]:
-                    rect = pg.Rect((20 + 20 * column, 20 + 20 * row), (20, 20))
-                    pg.draw.rect(display, "orange", rect)
 
 class Block:
     def __init__(self, shape: list[np.ndarray], grid: list[list], screen_size: tuple[int, int]):
@@ -91,7 +69,6 @@ class Block:
         self.end_y: int = self.start_y + len(self.shape) - 1
 
         self.shift: int = 0
-        print(self.shape, self.end_y, self.start_y - 1, self.end_x, self.start_x - 1)
 
     def add_to_grid(self):
         for i in range(len(self.shape)):
@@ -119,3 +96,14 @@ class Block:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
                 self.__move(Direction.LEFT)
+
+    def can_fall(self, level) -> bool:
+        n = [*range(self.start_x, self.end_x + 1)]
+        if level > self.screen_size[1] / self.step - 3:
+            return False
+
+        for i in range(len(self.shape[0])):
+            if self.shape[-1][i]:
+                if self.grid[level + 2][n[i]]:
+                    return False
+        return True
