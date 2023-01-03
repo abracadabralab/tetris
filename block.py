@@ -1,16 +1,8 @@
-<<<<<<< Updated upstream
-import pygame as pg
 import numpy as np
-=======
+import pygame as pg
 from enum import Enum
-from random import choice
->>>>>>> Stashed changes
-
-import numpy as np
-import pygame as pg
 
 ORANGE_RICKY = [
-<<<<<<< Updated upstream
     [False, False, True],
     [True, True, True]
 ]
@@ -25,39 +17,17 @@ CLEVELAND_Z = [
 RHODE_ISLAND_Z = [
     [False, True, True],
     [True, True, False]
-=======
-    [None, None, True],
-    [True, True, True]
-]
-BLUE_RICKY = [
-    [True, None, False],
-    [True, True, True]
-]
-CLEVELAND_Z = [
-    [True, True, None],
-    [None, True, True]
-]
-RHODE_ISLAND_Z = [
-    [None, True, True],
-    [True, True, None]
->>>>>>> Stashed changes
 ]
 HERO = [
     [True, True, True, True]
 ]
 TEEWEE = [
-<<<<<<< Updated upstream
     [False, True, False],
-=======
-    [None, True, None],
->>>>>>> Stashed changes
     [True, True, True]
 ]
 SMASHBOY = [
     [True, True],
     [True, True]
-<<<<<<< Updated upstream
-=======
 ]
 SHAPES = list(map(np.array, [
     BLUE_RICKY,
@@ -77,7 +47,6 @@ COLORS = [
     "cyan",
     "purple",
     "yellow",
->>>>>>> Stashed changes
 ]
 BLOCKS = list(map(np.array, [
     BLUE_RICKY,
@@ -88,6 +57,11 @@ BLOCKS = list(map(np.array, [
     SMASHBOY,
     TEEWEE,
 ]))
+
+class Direction(Enum):
+    RIGHT = 1
+    LEFT = 2
+
 
 
 class Block:
@@ -103,8 +77,6 @@ class Block:
                     rect = pg.Rect((20 + 20 * column, 20 + 20 * row), (20, 20))
                     pg.draw.rect(display, "orange", rect)
 
-<<<<<<< Updated upstream
-=======
 class Block:
     def __init__(self, shape: list[np.ndarray], grid: list[list], screen_size: tuple[int, int]):
         self.grid: list[list] = grid
@@ -139,16 +111,11 @@ class Block:
             case Direction.LEFT:
                 self.shift -= 1
 
->>>>>>> Stashed changes
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_UP:
                 self.shape = np.rot90(self.shape, 1)
-<<<<<<< Updated upstream
-                
-=======
             if event.key == pg.K_RIGHT:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
                 self.__move(Direction.LEFT)
->>>>>>> Stashed changes

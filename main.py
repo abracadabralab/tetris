@@ -1,6 +1,6 @@
 from random import choice
 import pygame as pg
-from block import Block, BLOCKS
+from block import Block, SHAPES
 
 
 class Window:
@@ -8,14 +8,6 @@ class Window:
         self.screen_size: tuple[int, int] = size
         self.display = pg.display.set_mode(size)
         self.clock = pg.time.Clock()
-<<<<<<< Updated upstream
-        self.fps = fps
-        self.run = True
-        self.blocks = []
-
-    def start(self):
-        self.blocks.append(Block(shape=choice(BLOCKS)))
-=======
         self.fps: int = fps
         self.run: bool = True
         self.blocks: list = []
@@ -28,7 +20,6 @@ class Window:
         self.blocks.append(Block(choice(SHAPES), self.grid, self.screen_size))
         self.current_block = self.blocks[-1]
         self.current_block.add_to_grid()
->>>>>>> Stashed changes
 
         while self.run:
             for event in pg.event.get():
@@ -37,15 +28,6 @@ class Window:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         self.run = False
-<<<<<<< Updated upstream
-                for block in self.blocks:
-                    block.handle_event(event)
-
-            self.display.fill("black")
-
-            for block in self.blocks:
-                block.draw(self.display)
-=======
                 self.current_block.handle_event(event)
 
             self.display.fill("black")
@@ -60,16 +42,10 @@ class Window:
                 self.current_block.add_to_grid()
 
             self.draw_grid()
->>>>>>> Stashed changes
 
             pg.display.flip()
             self.clock.tick(self.fps)
 
-<<<<<<< Updated upstream
-
-def main():
-    window = Window((700, 720))
-=======
     def draw_grid(self):
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
@@ -79,9 +55,8 @@ def main():
 
 
 def main():
-    width, height = 700, 720
+    width, height = 700, 520
     window = Window((width, height))
->>>>>>> Stashed changes
     window.start()
 
 
