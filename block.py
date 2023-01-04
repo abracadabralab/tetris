@@ -1,92 +1,53 @@
-import pygame as pg
 import numpy as np
-from dataclasses import dataclass
+import pygame as pg
 from enum import Enum
-from pygame.math import Vector2
-from random import choice
-from pygame.surface import Surface
-
-
-@dataclass
-class Shape:
-    color: str
-    points: list[Vector2]
-
 
 ORANGE_RICKY = [
-    Vector2(0, 40),
-    Vector2(60, 40),
-    Vector2(60, 0),
-    Vector2(40, 0),
-    Vector2(40, 20),
-    Vector2(0, 20),
-    Vector2(0, 40),
+    [False, False, True],
+    [True, True, True]
 ]
 BLUE_RICKY = [
-    Vector2(0, 40),
-    Vector2(60, 40),
-    Vector2(60, 20),
-    Vector2(20, 20),
-    Vector2(20, 0),
-    Vector2(0, 0),
-    Vector2(0, 40),
+    [True, False, False],
+    [True, True, True]
 ]
 CLEVELAND_Z = [
-    Vector2(0, 0),
-    Vector2(0, 20),
-    Vector2(20, 20),
-    Vector2(20, 40),
-    Vector2(60, 40),
-    Vector2(60, 20),
-    Vector2(40, 20),
-    Vector2(40, 0),
-    Vector2(0, 0),
+    [True, True, False],
+    [False, True, True]
 ]
 RHODE_ISLAND_Z = [
-    Vector2(0, 40),
-    Vector2(40, 40),
-    Vector2(40, 20),
-    Vector2(60, 20),
-    Vector2(60, 0),
-    Vector2(20, 0),
-    Vector2(20, 20),
-    Vector2(0, 20),
-    Vector2(0, 40),
+    [False, True, True],
+    [True, True, False]
 ]
 HERO = [
-    Vector2(0, 0),
-    Vector2(0, 20),
-    Vector2(80, 20),
-    Vector2(80, 0),
-    Vector2(0, 0),
+    [True, True, True, True]
 ]
 TEEWEE = [
-    Vector2(0, 40),
-    Vector2(60, 40),
-    Vector2(60, 20),
-    Vector2(40, 20),
-    Vector2(40, 0),
-    Vector2(20, 0),
-    Vector2(20, 20),
-    Vector2(0, 20),
-    Vector2(0, 40),
+    [False, True, False],
+    [True, True, True]
 ]
 SMASHBOY = [
-    Vector2(0, 0),
-    Vector2(0, 40),
-    Vector2(40, 40),
-    Vector2(40, 0),
-    Vector2(0, 0),
+    [True, True],
+    [True, True]
 ]
-SHAPES = [
-    Shape("orange", ORANGE_RICKY),
-    Shape("blue", BLUE_RICKY),
-    Shape("red", CLEVELAND_Z),
-    Shape("green", RHODE_ISLAND_Z),
-    Shape("cyan", HERO),
-    Shape("purple", TEEWEE),
-    Shape("yellow", SMASHBOY),
-]
+SHAPES = list(map(np.array, [
+    BLUE_RICKY,
+    CLEVELAND_Z,
+    HERO,
+    ORANGE_RICKY,
+    RHODE_ISLAND_Z,
+    SMASHBOY,
+    TEEWEE,
+]))
+
+COLORS = {
+    "ORANGE_RICKY": "orange",
+    "BLUE_RICKY": "blue",
+    "CLEVELAND_Z": "red",
+    "RHODE_ISLAND_Z": "green",
+    "HERO": "cyan",
+    "TEEWEE": "purple",
+    "SMASHBOY": "yellow",
+}
 
 
 class Direction(Enum):
@@ -94,49 +55,56 @@ class Direction(Enum):
     LEFT = 2
 
 
-class Block(pg.sprite.Sprite):
-    def __init__(self, shape: Shape):
-        super().__init__()
-        self.shape: Shape = shape
+class Block:
+    def __init__(self, shape: list[np.ndarray], grid: list[list], screen_size: tuple[int, int]):
+        self.grid: list[list] = grid
+        self.shape: list[np.ndarray] = shape
+        self.block_size: tuple[int, int] = (20, 20)
         self.step: int = 20
-        self.speed = 2
-        self.pos: Vector2 = Vector2(20, 20)
-        self.surface: Surface = Surface((80, 80), pg.SRCALPHA, 32).convert_alpha()
-        self.rect = pg.draw.polygon(self.surface, self.shape.color, self.shape.points)
+        self.screen_size: tuple[int, int] = screen_size
 
-    def draw(self, display: Surface):
-        display.blit(self.surface, self.pos, self.rect)
+        self.start_x: int = int(self.screen_size[0] / (self.step * 2))
+        self.start_y: int = 0
+        self.end_x: int = self.start_x + len(self.shape[0]) - 1
+        self.end_y: int = self.start_y + len(self.shape) - 1
 
-    def fall(self):
-        self.pos.y += self.speed
+        self.shift: int = 0
 
-    def handle_event(self, event) -> None:
+    def add_to_grid(self):
+        for i in range(len(self.shape)):
+            for j in range(len(self.shape[i])):
+                self.grid[i][j + self.start_x] = self.shape[i][j]
+
+    def fall(self, level):
+        for row in range(self.end_y, self.start_y - 1, -1):
+            for block in range(self.end_x, self.start_x - 1, -1):
+                if not self.grid[row + level + 1][block]:
+                    self.grid[row + 1 + level][block] = self.grid[row + level][block]
+                self.grid[row + level][block] = None
+
+    def __move(self, direction: Direction):
+        match direction:
+            case Direction.RIGHT:
+                self.shift += 1
+            case Direction.LEFT:
+                self.shift -= 1
+
+    def handle_event(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_UP:
-                self.__rotate()
+                self.shape = np.rot90(self.shape, 1)
             if event.key == pg.K_RIGHT:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
                 self.__move(Direction.LEFT)
-            if event.key == pg.K_SPACE:
-                self.__inc_speed()
-        if event.type == pg.KEYUP:
-            if event.key == pg.K_SPACE:
-                self.__dec_speed()
 
-    def __rotate(self) -> None:
-        self.surface = pg.transform.rotate(self.surface, 90)
-        self.rect = self.surface.get_rect()
+    def can_fall(self, level) -> bool:
+        n = [*range(self.start_x, self.end_x + 1)]
+        if level > self.screen_size[1] / self.step - 3:
+            return False
 
-    def __move(self, direction: Direction) -> None:
-        match direction:
-            case Direction.RIGHT:
-                self.pos.x += self.step
-            case Direction.LEFT:
-                self.pos.x -= self.step
-
-    def __inc_speed(self):
-        self.speed *= 3
-
-    def __dec_speed(self):
-        self.speed /= 3
+        for i in range(len(self.shape[0])):
+            if self.shape[-1][i]:
+                if self.grid[level + len(self.shape)][n[i]]:
+                    return False
+        return True

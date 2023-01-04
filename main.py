@@ -4,17 +4,22 @@ from block import Block, SHAPES
 
 
 class Window:
-    def __init__(self, size: tuple, fps: int = 60):
+    def __init__(self, size: tuple, fps: int = 5):
+        self.screen_size: tuple[int, int] = size
         self.display = pg.display.set_mode(size)
         self.clock = pg.time.Clock()
-        self.fps = fps
-        self.run = True
-        self.blocks: pg.sprite.Group = pg.sprite.Group()
+        self.fps: int = fps
+        self.run: bool = True
+        self.blocks: list = []
         self.current_block: Block = None
+        self.grid: list[list] = [[False] * int(size[0] / 20) for _ in range(int(size[1] / 20))]
+        self.step: int = 20
+        self.block_level: int = 0
 
     def start(self):
-        self.blocks.add(self.new_block())
-        self.current_block = self.blocks.sprites()[-1]
+        self.blocks.append(Block(choice(SHAPES), self.grid, self.screen_size))
+        self.current_block = self.blocks[-1]
+        self.current_block.add_to_grid()
 
         while self.run:
             for event in pg.event.get():
@@ -23,27 +28,34 @@ class Window:
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_ESCAPE:
                         self.run = False
-                    if event.key == pg.K_n:
-                        self.blocks.add(self.new_block())
-                        self.current_block = self.blocks.sprites()[-1]
                 self.current_block.handle_event(event)
 
             self.display.fill("black")
 
-            self.current_block.fall()
-            for block in self.blocks:
-                block.draw(self.display)
+            if self.current_block.can_fall(self.block_level):
+                self.current_block.fall(self.block_level)
+                self.block_level += 1
+            else:
+                self.block_level = 0
+                self.blocks.append(Block(choice(SHAPES), self.grid, self.screen_size))
+                self.current_block = self.blocks[-1]
+                self.current_block.add_to_grid()
+
+            self.draw_grid()
 
             pg.display.flip()
             self.clock.tick(self.fps)
 
-    @staticmethod
-    def new_block() -> Block:
-        return Block(shape=choice(SHAPES))
+    def draw_grid(self):
+        for i in range(len(self.grid)):
+            for j in range(len(self.grid[i])):
+                if self.grid[i][j]:
+                    rect = pg.Rect((self.step * j, self.step * i), (self.step, self.step))
+                    pg.draw.rect(self.display, "orange", rect)
 
 
 def main():
-    height, width = 720, 700
+    width, height = 700, 520
     window = Window((width, height))
     window.start()
 
