@@ -1,3 +1,5 @@
+from random import choice
+
 import numpy as np
 import pygame as pg
 from enum import Enum
@@ -30,23 +32,23 @@ SMASHBOY = [
     [True, True]
 ]
 SHAPES = list(map(np.array, [
+    ORANGE_RICKY,
     BLUE_RICKY,
     CLEVELAND_Z,
-    HERO,
-    ORANGE_RICKY,
     RHODE_ISLAND_Z,
-    SMASHBOY,
+    HERO,
     TEEWEE,
+    SMASHBOY,
 ]))
 
 COLORS = {
-    "ORANGE_RICKY": "orange",
-    "BLUE_RICKY": "blue",
-    "CLEVELAND_Z": "red",
-    "RHODE_ISLAND_Z": "green",
-    "HERO": "cyan",
-    "TEEWEE": "purple",
-    "SMASHBOY": "yellow",
+    1: "orange",
+    2: "blue",
+    3: "red",
+    4: "green",
+    5: "cyan",
+    6: "purple",
+    7: "yellow",
 }
 
 
@@ -56,12 +58,15 @@ class Direction(Enum):
 
 
 class Block:
-    def __init__(self, shape: list[np.ndarray], grid: list[list], screen_size: tuple[int, int]):
+    def __init__(self, random_num: int, grid: list[list], screen_size: tuple[int, int]):
+        self.screen_size: tuple[int, int] = screen_size
         self.grid: list[list] = grid
-        self.shape: list[np.ndarray] = shape
+        self.random_number: int = random_num
+
+        self.shape: np.ndarray = SHAPES[random_num]
         self.block_size: tuple[int, int] = (20, 20)
         self.step: int = 20
-        self.screen_size: tuple[int, int] = screen_size
+        self.color: str = COLORS[random_num + 1]
 
         self.start_x: int = int(self.screen_size[0] / (self.step * 2))
         self.start_y: int = 0
@@ -73,14 +78,14 @@ class Block:
     def add_to_grid(self):
         for i in range(len(self.shape)):
             for j in range(len(self.shape[i])):
-                self.grid[i][j + self.start_x] = self.shape[i][j]
+                self.grid[i][j + self.start_x] = self.color if self.shape[i][j] else 0
 
     def fall(self, level):
         for row in range(self.end_y, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
-                if not self.grid[row + level + 1][block]:
-                    self.grid[row + 1 + level][block] = self.grid[row + level][block]
-                self.grid[row + level][block] = None
+                if self.grid[row + level + 1][block] == 0:
+                    self.grid[row + 1 + level][block] = self.color if self.grid[row + level][block] else 0
+                self.grid[row + level][block] = 0
 
     def __move(self, direction: Direction):
         match direction:
@@ -100,7 +105,7 @@ class Block:
 
     def can_fall(self, level) -> bool:
         n = [*range(self.start_x, self.end_x + 1)]
-        if level > self.screen_size[1] / self.step - 3:
+        if level > self.screen_size[1] / self.step - len(self.shape) - 1:
             return False
 
         for i in range(len(self.shape[0])):
