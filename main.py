@@ -32,9 +32,9 @@ class Window:
 
             self.display.fill("black")
 
-            if self.current_block.can_fall(self.block_level):
-                self.current_block.fall(self.block_level)
-                self.block_level += 1
+            if self.current_block.can_fall():
+                self.current_block.fall()
+                self.current_block.level += 1
             else:
                 self.block_level = 0
                 self.blocks.append(Block(choice([*range(1, 7)]), self.grid, self.screen_size))

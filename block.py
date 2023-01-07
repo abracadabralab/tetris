@@ -67,6 +67,7 @@ class Block:
         self.block_size: tuple[int, int] = (20, 20)
         self.step: int = 20
         self.color: str = COLORS[random_num + 1]
+        self.level: int = 0
 
         self.start_x: int = int(self.screen_size[0] / (self.step * 2))
         self.start_y: int = 0
@@ -80,12 +81,13 @@ class Block:
             for j in range(len(self.shape[i])):
                 self.grid[i][j + self.start_x] = self.color if self.shape[i][j] else 0
 
-    def fall(self, level):
+    def fall(self):
         for row in range(self.end_y, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
-                if self.grid[row + level + 1][block] == 0:
-                    self.grid[row + 1 + level][block] = self.color if self.grid[row + level][block] else 0
-                self.grid[row + level][block] = 0
+                if self.grid[row + self.level + 1][block + self.shift] == 0:
+                    self.grid[row + 1 + self.level][block + self.shift] = self.color \
+                        if self.grid[row + self.level][block + self.shift] else 0
+                self.grid[row + self.level][block + self.shift] = 0
 
     def __move(self, direction: Direction):
         match direction:
@@ -93,6 +95,12 @@ class Block:
                 self.shift += 1
             case Direction.LEFT:
                 self.shift -= 1
+        for row in range(self.end_y + 1, self.start_y - 1, -1):
+            for block in range(self.end_x, self.start_x - 1, -1):
+                print(row, block, self.level, self.grid[row + self.level][block])
+                if self.grid[row + self.level][block] != 0:
+                    self.grid[row + self.level][block + self.shift] = self.grid[row + self.level][block]
+                    self.grid[row + self.level][block] = 0
 
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
@@ -102,14 +110,16 @@ class Block:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
                 self.__move(Direction.LEFT)
+            if event.key == pg.K_0:
+                self.__move(Direction.RIGHT)
 
-    def can_fall(self, level) -> bool:
-        n = [*range(self.start_x, self.end_x + 1)]
-        if level > self.screen_size[1] / self.step - len(self.shape) - 1:
+    def can_fall(self) -> bool:
+        n = [*range(self.start_x + self.shift, self.end_x + self.shift + 1)]
+        if self.level > self.screen_size[1] / self.step - len(self.shape) - 1:
             return False
 
         for i in range(len(self.shape[0])):
             if self.shape[-1][i]:
-                if self.grid[level + len(self.shape)][n[i]]:
+                if self.grid[self.level + len(self.shape)][n[i]]:
                     return False
         return True
