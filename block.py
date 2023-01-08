@@ -84,23 +84,31 @@ class Block:
     def fall(self):
         for row in range(self.end_y, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
-                if self.grid[row + self.level + 1][block + self.shift] == 0:
-                    self.grid[row + 1 + self.level][block + self.shift] = self.color \
-                        if self.grid[row + self.level][block + self.shift] else 0
-                self.grid[row + self.level][block + self.shift] = 0
+                if self.grid[row + 1][block] == 0:
+                    self.grid[row + 1][block] = self.color \
+                        if self.grid[row][block] else 0
+                self.grid[row][block] = 0
+        self.start_y += 1
+        self.end_y += 1
 
     def __move(self, direction: Direction):
         match direction:
             case Direction.RIGHT:
-                self.shift += 1
+                self.shift = 1
             case Direction.LEFT:
-                self.shift -= 1
+                self.shift = -1
         for row in range(self.end_y + 1, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
-                print(row, block, self.level, self.grid[row + self.level][block])
-                if self.grid[row + self.level][block] != 0:
-                    self.grid[row + self.level][block + self.shift] = self.grid[row + self.level][block]
-                    self.grid[row + self.level][block] = 0
+                if self.grid[row][block] != 0:
+                    self.grid[row][block + self.shift] = self.grid[row][block]
+                    self.grid[row][block] = 0
+        match direction:
+            case Direction.RIGHT:
+                self.start_x += 1
+                self.end_x += 1
+            case Direction.LEFT:
+                self.start_x -= 1
+                self.end_x -= 1
 
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
