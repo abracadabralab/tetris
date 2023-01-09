@@ -98,17 +98,19 @@ class Block:
             case Direction.LEFT:
                 self.shift = -1
         for row in range(self.end_y + 1, self.start_y - 1, -1):
-            for block in range(self.end_x, self.start_x - 1, -1):
-                if self.grid[row][block] != 0:
-                    self.grid[row][block + self.shift] = self.grid[row][block]
-                    self.grid[row][block] = 0
-        match direction:
-            case Direction.RIGHT:
-                self.start_x += 1
-                self.end_x += 1
-            case Direction.LEFT:
-                self.start_x -= 1
-                self.end_x -= 1
+            match direction:
+                case Direction.RIGHT:
+                    for block in range(self.end_x, self.start_x - 1, -1):
+                        if self.grid[row][block] != 0:
+                            self.grid[row][block + self.shift] = self.grid[row][block]
+                            self.grid[row][block] = 0
+                case Direction.LEFT:
+                    for block in range(self.start_x, self.end_x + 1):
+                        if self.grid[row][block] != 0:
+                            self.grid[row][block - 1] = self.grid[row][block]
+                            self.grid[row][block] = 0
+        self.start_x += self.shift
+        self.end_x += self.shift
 
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
@@ -118,8 +120,10 @@ class Block:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
                 self.__move(Direction.LEFT)
-            if event.key == pg.K_0:
+            if event.key == pg.K_d:
                 self.__move(Direction.RIGHT)
+            if event.key == pg.K_a:
+                self.__move(Direction.LEFT)
 
     def can_fall(self) -> bool:
         n = [*range(self.start_x + self.shift, self.end_x + self.shift + 1)]
