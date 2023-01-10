@@ -4,7 +4,7 @@ from block import Block, COLORS
 
 
 class Window:
-    def __init__(self, size: tuple, fps: int = 10):
+    def __init__(self, size: tuple, fps: int = 5):
         self.screen_size: tuple[int, int] = size
         self.display = pg.display.set_mode(size)
         self.clock = pg.time.Clock()

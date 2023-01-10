@@ -85,8 +85,7 @@ class Block:
         for row in range(self.end_y, self.start_y - 1, -1):
             for block in range(self.end_x, self.start_x - 1, -1):
                 if self.grid[row + 1][block] == 0:
-                    self.grid[row + 1][block] = self.color \
-                        if self.grid[row][block] else 0
+                    self.grid[row + 1][block] = self.color if self.grid[row][block] else 0
                 self.grid[row][block] = 0
         self.start_y += 1
         self.end_y += 1
@@ -109,29 +108,49 @@ class Block:
                         if self.grid[row][block] != 0:
                             self.grid[row][block - 1] = self.grid[row][block]
                             self.grid[row][block] = 0
+
         self.start_x += self.shift
         self.end_x += self.shift
+
+    def __rotate(self):
+        for row in range(len(self.shape)):
+            for block in range(len(self.shape[row])):
+                self.grid[self.start_y + row][self.start_x + block] = 0
+
+        self.shape = np.rot90(self.shape, 1)
+        for row in range(len(self.shape)):
+            for block in range(len(self.shape[row])):
+                self.grid[self.start_y + row][self.start_x + block] = self.color if self.shape[row][block] else 0
+                
+        self.end_x = self.start_x + len(self.shape[0])
+        self.end_y = self.start_y + len(self.shape)
 
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_UP:
-                self.shape = np.rot90(self.shape, 1)
+                if self.grid[self.start_y + len(self.shape[0])][self.start_x] == 0:
+                    self.__rotate()
+                    print("true")
             if event.key == pg.K_RIGHT:
-                self.__move(Direction.RIGHT)
+                if self.end_x + self.shift < len(self.grid[0]) and self.grid[self.end_y][self.end_x + 1] == 0:
+                    self.__move(Direction.RIGHT)
             if event.key == pg.K_LEFT:
-                self.__move(Direction.LEFT)
+                if self.start_x - 1 >= 0 and self.grid[self.start_y][self.start_x - 1] == 0:
+                    self.__move(Direction.LEFT)
             if event.key == pg.K_d:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_a:
                 self.__move(Direction.LEFT)
 
     def can_fall(self) -> bool:
-        n = [*range(self.start_x + self.shift, self.end_x + self.shift + 1)]
+        n = [*range(self.start_x, self.end_x + 1)]
+
         if self.level > self.screen_size[1] / self.step - len(self.shape) - 1:
             return False
 
         for i in range(len(self.shape[0])):
             if self.shape[-1][i]:
-                if self.grid[self.level + len(self.shape)][n[i]]:
+                if self.grid[self.end_y + 1][n[i]]:
                     return False
+
         return True
