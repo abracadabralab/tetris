@@ -40,6 +40,7 @@ class Window:
                 self.blocks.append(Block(choice([*range(1, 7)]), self.grid, self.screen_size))
                 self.current_block = self.blocks[-1]
                 self.current_block.add_to_grid()
+            self.draw_grid_lines()
             self.draw_grid()
 
             pg.display.flip()
@@ -51,6 +52,13 @@ class Window:
                 if self.grid[i][j] != 0:
                     rect = pg.Rect((self.step * j, self.step * i), (self.step, self.step))
                     pg.draw.rect(self.display, str(self.grid[i][j]), rect)
+
+    def draw_grid_lines(self):
+        for i in range(self.step, self.screen_size[0], self.step):
+            pg.draw.line(self.display, "#3a3b3c", (0, i), (self.screen_size[0], i))
+
+        for j in range(self.step, self.screen_size[0], self.step):
+            pg.draw.line(self.display, "#3a3b3c", (j, 0), (j, self.screen_size[0]))
 
 
 def main():

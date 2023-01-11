@@ -122,15 +122,14 @@ class Block:
             for block in range(len(self.shape[row])):
                 self.grid[self.start_y + row][self.start_x + block] = self.color if self.shape[row][block] else 0
                 
-        self.end_x = self.start_x + len(self.shape[0])
-        self.end_y = self.start_y + len(self.shape)
+        self.end_x = self.start_x + len(self.shape[0]) - 1
+        self.end_y = self.start_y + len(self.shape) - 1
 
     def handle_event(self, event):
         if event.type == pg.KEYDOWN:
             if event.key == pg.K_UP:
                 if self.grid[self.start_y + len(self.shape[0])][self.start_x] == 0:
                     self.__rotate()
-                    print("true")
             if event.key == pg.K_RIGHT:
                 if self.end_x + self.shift < len(self.grid[0]) and self.grid[self.end_y][self.end_x + 1] == 0:
                     self.__move(Direction.RIGHT)
