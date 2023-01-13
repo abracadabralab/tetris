@@ -12,8 +12,10 @@ class Window:
         self.run: bool = True
         self.blocks: list = []
         self.current_block: Block = None
-        self.grid: list[list] = [[0] * int(size[0] / 20) for _ in range(int(size[1] / 20))]
+        self.grid: list[list] = [[0] * 17 for _ in range(int(size[1] / 20))]
+
         self.step: int = 20
+        self.shift = 9
         self.block_level: int = 0
 
     def start(self):
@@ -40,26 +42,27 @@ class Window:
                 self.blocks.append(Block(choice([*range(1, 7)]), self.grid, self.screen_size))
                 self.current_block = self.blocks[-1]
                 self.current_block.add_to_grid()
+
             self.draw_grid_lines()
             self.draw_grid()
 
-            speed = self.current_block.speed
-
             pg.display.flip()
-            self.clock.tick(self.fps + speed)
+            self.clock.tick(self.fps + self.current_block.speed)
 
     def draw_grid(self):
         for i in range(len(self.grid)):
             for j in range(len(self.grid[i])):
                 if self.grid[i][j] != 0:
-                    rect = pg.Rect((self.step * j, self.step * i), (self.step, self.step))
+                    rect = pg.Rect((2 * self.shift * self.step + self.step * j - self.shift * self.step, self.step * i),
+                                   (self.step, self.step))
                     pg.draw.rect(self.display, str(self.grid[i][j]), rect)
 
     def draw_grid_lines(self):
         for i in range(self.step, self.screen_size[0], self.step):
-            pg.draw.line(self.display, "#3a3b3c", (0, i), (self.screen_size[0], i))
+            pg.draw.line(self.display, "#3a3b3c", (self.shift * self.step, i),
+                         (self.screen_size[0] - self.shift * self.step, i))
 
-        for j in range(self.step, self.screen_size[0], self.step):
+        for j in range(self.shift * self.step, self.screen_size[0] - self.shift * self.step + 1, self.step):
             pg.draw.line(self.display, "#3a3b3c", (j, 0), (j, self.screen_size[0]))
 
 

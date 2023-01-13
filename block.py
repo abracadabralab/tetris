@@ -67,7 +67,7 @@ class Block:
         self.color: str = COLORS[random_num + 1]
         self.level: int = 0
 
-        self.start_x: int = int(self.screen_size[0] / (self.step * 2))
+        self.start_x: int = 9 + int(len(self.grid[0]) / self.step) - len(self.shape)
         self.start_y: int = 0
         self.end_x: int = self.start_x + len(self.shape[0]) - 1
         self.end_y: int = self.start_y + len(self.shape) - 1
@@ -137,7 +137,7 @@ class Block:
                 if self.start_x - 1 >= 0 and self.grid[self.start_y][self.start_x - 1] == 0:
                     self.__move(Direction.LEFT)
             if event.key == pg.K_DOWN:
-                self.speed = 15
+                self.speed = 30
             if event.key == pg.K_d:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_a:
@@ -153,5 +153,11 @@ class Block:
             if self.shape[-1][i]:
                 if self.grid[self.end_y + 1][n[i]]:
                     return False
+
+        for i in range(len(self.grid)):
+            if 0 not in self.grid[i]:
+                self.grid.remove(self.grid[i])
+                self.grid.insert(0, ([0] * 17))
+
 
         return True
