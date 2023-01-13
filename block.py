@@ -150,14 +150,13 @@ class Block:
             return False
 
         for i in range(len(self.shape[0])):
-            if self.shape[-1][i]:
-                if self.grid[self.end_y + 1][n[i]]:
-                    return False
+            shift = 1 if self.shape[-1][i] else 0
+            if self.grid[self.end_y + shift][n[i]]:
+                return False
 
         for i in range(len(self.grid)):
             if 0 not in self.grid[i]:
                 self.grid.remove(self.grid[i])
                 self.grid.insert(0, ([0] * 17))
-
 
         return True
