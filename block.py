@@ -1,5 +1,3 @@
-from random import choice
-
 import numpy as np
 import pygame as pg
 from enum import Enum
@@ -76,6 +74,8 @@ class Block:
 
         self.shift: int = 0
 
+        self.speed = 1
+
     def add_to_grid(self):
         for i in range(len(self.shape)):
             for j in range(len(self.shape[i])):
@@ -136,6 +136,8 @@ class Block:
             if event.key == pg.K_LEFT:
                 if self.start_x - 1 >= 0 and self.grid[self.start_y][self.start_x - 1] == 0:
                     self.__move(Direction.LEFT)
+            if event.key == pg.K_DOWN:
+                self.speed = 15
             if event.key == pg.K_d:
                 self.__move(Direction.RIGHT)
             if event.key == pg.K_a:

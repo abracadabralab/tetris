@@ -1,6 +1,6 @@
 from random import choice
 import pygame as pg
-from block import Block, COLORS
+from block import Block
 
 
 class Window:
@@ -43,8 +43,10 @@ class Window:
             self.draw_grid_lines()
             self.draw_grid()
 
+            speed = self.current_block.speed
+
             pg.display.flip()
-            self.clock.tick(self.fps)
+            self.clock.tick(self.fps + speed)
 
     def draw_grid(self):
         for i in range(len(self.grid)):
