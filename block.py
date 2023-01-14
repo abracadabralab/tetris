@@ -65,7 +65,8 @@ class Block:
         self.block_size: tuple[int, int] = (20, 20)
         self.step: int = 20
         self.color: str = COLORS[random_num + 1]
-        self.level: int = 0
+        self.block_level: int = 0
+        self.lines: int = 0
 
         self.start_x: int = 9 + int(len(self.grid[0]) / self.step) - len(self.shape)
         self.start_y: int = 0
@@ -138,15 +139,11 @@ class Block:
                     self.__move(Direction.LEFT)
             if event.key == pg.K_DOWN:
                 self.speed = 30
-            if event.key == pg.K_d:
-                self.__move(Direction.RIGHT)
-            if event.key == pg.K_a:
-                self.__move(Direction.LEFT)
 
-    def can_fall(self) -> bool:
+    def can_fall(self, lines) -> bool:
         n = [*range(self.start_x, self.end_x + 1)]
 
-        if self.level > self.screen_size[1] / self.step - len(self.shape) - 1:
+        if self.block_level > self.screen_size[1] / self.step - len(self.shape) - 1:
             return False
 
         for i in range(len(self.shape[0])):
@@ -158,5 +155,6 @@ class Block:
             if 0 not in self.grid[i]:
                 self.grid.remove(self.grid[i])
                 self.grid.insert(0, ([0] * 17))
+                self.lines = lines + 1
 
         return True
