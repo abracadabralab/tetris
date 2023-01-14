@@ -5,3 +5,5 @@
 * For rotation use **up arrow** <br/>
 * For speeding up the block use **down arrow** <br/>
 * To exit press **ESCAPE**
+
+For each block score increases, for every 10 lines level increases.
