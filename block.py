@@ -59,28 +59,30 @@ class Block:
     def __init__(self, random_num: int, grid: list[list], screen_size: tuple[int, int]):
         self.screen_size: tuple[int, int] = screen_size
         self.grid: list[list] = grid
-        self.random_number: int = random_num
+        self.game_over = False
 
+        self.random_number: int = random_num
         self.shape: np.ndarray = SHAPES[random_num]
         self.block_size: tuple[int, int] = (20, 20)
         self.step: int = 20
         self.color: str = COLORS[random_num + 1]
+
         self.block_level: int = 0
-        self.lines: int = 0
+        self.shift: int = 0
+        self.speed = 1
 
         self.start_x: int = 9 + int(len(self.grid[0]) / self.step) - len(self.shape)
         self.start_y: int = 0
         self.end_x: int = self.start_x + len(self.shape[0]) - 1
         self.end_y: int = self.start_y + len(self.shape) - 1
 
-        self.shift: int = 0
-
-        self.speed = 1
-
     def add_to_grid(self):
         for i in range(len(self.shape)):
             for j in range(len(self.shape[i])):
-                self.grid[i][j + self.start_x] = self.color if self.shape[i][j] else 0
+                if self.grid[i][j + self.start_x] == 0:
+                    self.grid[i][j + self.start_x] = self.color if self.shape[i][j] else 0
+                else:
+                    self.game_over = True
 
     def fall(self):
         for row in range(self.end_y, self.start_y - 1, -1):
@@ -140,7 +142,7 @@ class Block:
             if event.key == pg.K_DOWN:
                 self.speed = 30
 
-    def can_fall(self, lines) -> bool:
+    def can_fall(self) -> bool:
         n = [*range(self.start_x, self.end_x + 1)]
 
         if self.block_level > self.screen_size[1] / self.step - len(self.shape) - 1:
@@ -150,11 +152,5 @@ class Block:
             shift = 1 if self.shape[-1][i] else 0
             if self.grid[self.end_y + shift][n[i]]:
                 return False
-
-        for i in range(len(self.grid)):
-            if 0 not in self.grid[i]:
-                self.grid.remove(self.grid[i])
-                self.grid.insert(0, ([0] * 17))
-                self.lines = lines + 1
 
         return True
